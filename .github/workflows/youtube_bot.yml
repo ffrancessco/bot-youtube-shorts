@@ -1,4 +1,4 @@
-name: Node.js YouTube Shorts Bot
+name: YouTube Shorts Bot
 on:
   schedule:
     - cron: '0 */2 * * *'
