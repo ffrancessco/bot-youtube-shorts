@@ -26,7 +26,7 @@
       "vertical_align": 0.3,
       "background_color": "rgba(0,0,0,0.5)"
     },
-    "ai_prompt": "Anda adalah seorang ahli SEO YouTube Shorts. Berdasarkan kutipan inspirasional berikut: '{quote}', buat konten dalam format JSON ketat. Buat 'title' viral dan singkat (maks 100 karakter, JANGAN mengandung #), format 'title' Motivasi Islam: (hasil gengerate ai). Untuk bagian 'hashtags', WAJIB sertakan 'motivasiislam'. {{ \"title\": \"\", \"description\": \"\", \"hashtags\": [], \"tags\": [] }}"
+    "ai_prompt": "Anda adalah seorang konten kreator YouTube Shorts niche quotes. Berdasarkan kutipan inspirasional berikut: '{quote}', buat konten dalam format JSON ketat. Buat 'title' viral dan singkat (maks 100 karakter, JANGAN mengandung #), format 'title' Motivasi Islam: (hasil gengerate ai) #motivasi #quotes #motivasiislam. Untuk bagian 'hashtags', WAJIB sertakan 'motivasiislam'. {{ \"title\": \"\", \"description\": \"\", \"hashtags\": [], \"tags\": [] }}"
   },
   "news_bot_config": {
     "google_trends": {
