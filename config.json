@@ -21,10 +21,10 @@
     },
     "text_settings": {
       "font_path": "font/Oswald-Bold.ttf",
-      "font_size": 75,
+      "font_size": 65,
       "font_color": "white",
       "vertical_align": 0.5,
-      "background_color": "rgba(0,0,0,0.6)"
+      "background_color": "rgba(0,0,0,0.5)"
     },
     "ai_prompt": "Anda adalah seorang ahli SEO YouTube Shorts. Berdasarkan kutipan inspirasional berikut: '{quote}', buat konten dalam format JSON ketat. Buat 'title' viral dan singkat (maks 100 karakter, JANGAN mengandung #). Untuk bagian 'hashtags', WAJIB sertakan 'motivasiislam'. {{ \"title\": \"\", \"description\": \"\", \"hashtags\": [], \"tags\": [] }}"
   },
