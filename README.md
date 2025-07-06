@@ -59,72 +59,115 @@ Ini adalah bagian terpenting untuk memberikan izin kepada bot agar bisa menguplo
 
 **B. Dapatkan Kunci `token.json` di Komputer Anda**
 
-1.  **Buat File Otorisasi (`authorize.js`)**
-    -   Di folder proyek utama Anda, buat sebuah file baru dan beri nama **`authorize.js`**.
-    -   Salin dan tempel **seluruh kode** di bawah ini ke dalam file `authorize.js` tersebut:
+# Panduan Otorisasi YouTube API untuk Bot
 
-    ```javascript
-    // File: authorize.js
-    // Skrip ini hanya untuk dijalankan satu kali di komputer lokal
-    // untuk menghasilkan file token.json
+Panduan ini menjelaskan cara melakukan otorisasi satu kali di komputer lokal Anda untuk menghasilkan file `token.json` yang akan digunakan oleh bot di GitHub Actions.
 
-    import { google } from 'googleapis';
-    import { authenticate } from '@google-cloud/local-auth';
-    import fs from 'fs/promises';
-    import path from 'path';
-    import process from 'process';
+## Prasyarat
 
-    const log = (message) => console.log(`[AUTH] ${message}`);
+-   [Node.js](https://nodejs.org/) sudah terinstal di komputer Anda.
+-   Anda sudah memiliki file `client_secret.json` yang diunduh dari Google Cloud Console.
 
-    const __dirname = path.dirname(new URL(import.meta.url).pathname.substring(1));
-    const CREDENTIALS_PATH = path.join(__dirname, 'client_secret.json');
-    const TOKEN_PATH = path.join(__dirname, 'token.json');
-    const SCOPES = ['[https://www.googleapis.com/auth/youtube.upload](https://www.googleapis.com/auth/youtube.upload)'];
+## Langkah-langkah Otorisasi
 
-    async function saveCredentials(client) {
-        const content = await fs.readFile(CREDENTIALS_PATH, 'utf-8');
-        const keys = JSON.parse(content);
-        const key = keys.installed || keys.web;
-        const payload = JSON.stringify({
-            type: 'authorized_user',
-            client_id: key.client_id,
-            client_secret: key.client_secret,
-            refresh_token: client.credentials.refresh_token,
+### 1. Siapkan Folder Proyek
+
+Buat sebuah folder baru di komputer Anda khusus untuk proses otorisasi ini. Masukkan file-file berikut ke dalamnya:
+
+-   `client_secret.json` (file yang Anda unduh dari Google)
+
+### 2. Buat File `package.json`
+
+Buat file baru di dalam folder tersebut bernama `package.json` dan isi dengan kode berikut. Ini untuk mendaftarkan library yang kita butuhkan.
+
+```json
+{
+  "name": "youtube-auth-helper",
+  "version": "1.0.0",
+  "description": "Skrip untuk mendapatkan token otorisasi YouTube",
+  "main": "authorize.js",
+  "type": "module",
+  "dependencies": {
+    "@google-cloud/local-auth": "^3.0.1",
+    "googleapis": "^140.0.1"
+  }
+}
+```
+
+### 3. Buat File `authorize.js`
+
+Buat file baru lagi bernama `authorize.js` dan isi dengan skrip di bawah ini. Skrip ini yang akan menjalankan proses otorisasi.
+
+```javascript
+import { google } from 'googleapis';
+import { authenticate } from '@google-cloud/local-auth';
+import fs from 'fs/promises';
+import path from 'path';
+
+const log = (message) => console.log(`[AUTH] ${message}`);
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname.substring(1));
+const CREDENTIALS_PATH = path.join(__dirname, 'client_secret.json');
+const TOKEN_PATH = path.join(__dirname, 'token.json');
+const SCOPES = ['[https://www.googleapis.com/auth/youtube.upload](https://www.googleapis.com/auth/youtube.upload)'];
+
+async function saveCredentials(client) {
+    const content = await fs.readFile(CREDENTIALS_PATH, 'utf-8');
+    const keys = JSON.parse(content);
+    const key = keys.installed || keys.web;
+    const payload = JSON.stringify({
+        type: 'authorized_user',
+        client_id: key.client_id,
+        client_secret: key.client_secret,
+        refresh_token: client.credentials.refresh_token,
+    });
+    await fs.writeFile(TOKEN_PATH, payload);
+}
+
+async function runAuthorization() {
+    try {
+        log("Memulai alur otorisasi baru...");
+        const client = await authenticate({
+            scopes: SCOPES,
+            keyfilePath: CREDENTIALS_PATH,
         });
-        await fs.writeFile(TOKEN_PATH, payload);
-    }
-
-    async function runAuthorization() {
-        try {
-            log("Memulai alur otorisasi baru...");
-            const client = await authenticate({
-                scopes: SCOPES,
-                keyfilePath: CREDENTIALS_PATH,
-            });
-            if (client.credentials) {
-                await saveCredentials(client);
-                log("\n✅ Otorisasi berhasil! File 'token.json' telah dibuat.");
-                log("Anda sekarang bisa menyalin isi 'client_secret.json' dan 'token.json' ke GitHub Secrets.");
-            }
-        } catch (e) {
-            console.error("Gagal melakukan otorisasi:", e);
+        if (client.credentials) {
+            await saveCredentials(client);
+            log("\n✅ Otorisasi berhasil! File 'token.json' telah dibuat.");
+            log("Anda sekarang bisa menyalin isi 'client_secret.json' dan 'token.json' ke GitHub Secrets.");
         }
+    } catch (e) {
+        console.error("Gagal melakukan otorisasi:", e);
     }
+}
 
-    runAuthorization();
+runAuthorization();
+```
+
+### 4. Jalankan Instalasi dan Otorisasi
+
+Sekarang, buka terminal atau Command Prompt di dalam folder proyek Anda, lalu jalankan dua perintah ini secara berurutan:
+
+1.  **Instal library yang dibutuhkan:**
+    ```bash
+    npm install
     ```
-2.  **Jalankan Skrip**: Di terminal Anda (pastikan berada di dalam folder proyek), jalankan:
+2.  **Jalankan skrip otorisasi:**
     ```bash
     node authorize.js
     ```
-3.  **Ikuti Alur Login di Browser**:
-    -   Sebuah jendela browser akan terbuka secara otomatis.
-    -   **Login** ke akun Google/YouTube Anda.
-    -   Jika muncul layar "Google hasn't verified this app", klik **"Advanced"** lalu **"Go to [nama aplikasi Anda] (unsafe)"**.
-    -   Klik **"Allow"** atau **"Izinkan"** pada layar persetujuan.
-    -   Setelah berhasil, Anda bisa menutup tab browser tersebut.
-4.  **Verifikasi**: Sebuah file baru bernama **`token.json`** akan muncul di folder proyek Anda.
 
+### 5. Ikuti Proses di Browser
+
+-   Sebuah **jendela browser akan terbuka** secara otomatis.
+-   **Login** ke akun Google/YouTube Anda.
+-   Jika muncul layar "Google hasn't verified this app", klik **"Advanced"** lalu **"Go to [nama aplikasi Anda] (unsafe)"**.
+-   Klik **"Allow"** atau **"Izinkan"** pada layar persetujuan.
+-   Setelah berhasil, Anda bisa menutup tab browser tersebut.
+
+### Hasil Akhir
+
+Setelah semua langkah di atas selesai, sebuah file baru bernama **`token.json`** akan muncul di folder Anda. Sekarang Anda memiliki `client_secret.json` dan `token.json` yang siap untuk disalin isinya ke dalam **GitHub Secrets** repositori Anda.
 ### Langkah 3: Konfigurasi GitHub Secrets dan Variables
 
 ## 🔑 Penyiapan Lisensi, Secrets, dan Variables
