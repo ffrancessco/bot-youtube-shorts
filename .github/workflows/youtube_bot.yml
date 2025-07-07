@@ -1,4 +1,4 @@
-name: Node.js YouTube Shorts Bot
+name: YouTube Shorts Bot
 
 on:
   schedule:
@@ -23,15 +23,12 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: 3. Install System Dependencies (FFmpeg & ImageMagick)
+      - name: 3. Install System Dependencies
         run: sudo apt-get update && sudo apt-get install -y ffmpeg imagemagick
 
       - name: 4. Install Node.js dependencies
-        run: |
-          # Perintah ini akan menginstal semua library dari package.json Anda
-          npm install
-          # --- PERUBAHAN DI SINI: Memastikan node-fetch terinstal ---
-          npm install node-fetch
+        # Cukup satu perintah ini. Pastikan 'node-fetch' ada di package.json Anda.
+        run: npm install
 
       - name: 5. Create Authentication Files from Secrets
         run: |
@@ -40,17 +37,12 @@ jobs:
 
       - name: 6. Jalankan Skrip Utama Bot
         env:
-          # --- PERUBAHAN DI SINI: Menambahkan secret untuk lisensi ---
+          # Ini adalah semua env yang dibutuhkan oleh kode final kita
           BOT_LICENSE_EMAIL: ${{ secrets.BOT_LICENSE_EMAIL }}
-
-          # Secrets lainnya yang sudah ada
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           YT_CHANNEL_NAME: ${{ vars.CHANNEL_NAME }}
-          GOOGLE_CLIENT_SECRET_JSON: ${{ secrets.GOOGLE_CLIENT_SECRET_JSON }} # Seharusnya GOOGLE_CREDENTIALS_JSON
-          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
-          YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
-        run: node index.js
+        run: node index.js # PERBAIKAN: Perintah 'run' dipindahkan ke posisi yang benar
 
       - name: 7. Simpan Log Baru ke Repositori
         if: success()
@@ -58,7 +50,7 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           # Cek apakah ada perubahan sebelum mencoba commit
-          if ! git diff --quiet --exit-code processed*.log quotes.txt; then
+          if ! git diff --quiet --exit-code processed_*.log quotes.txt; then
             git add .
             git commit -m "Bot: Update logs and quote list"
             git push
