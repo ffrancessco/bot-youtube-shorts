@@ -1,0 +1,9 @@
+# Abaikan file kredensial Google
+client_secret.json
+token.json
+
+# Abaikan folder dan file temporary lainnya
+node_modules/
+*.log
+output/
+downloads/
