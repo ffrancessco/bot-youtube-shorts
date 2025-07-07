@@ -1,4 +1,4 @@
-name: YouTube Shorts Bot
+name: Node.js YouTube Shorts Bot
 
 on:
   schedule:
@@ -27,7 +27,6 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg imagemagick
 
       - name: 4. Install Node.js dependencies
-        # Cukup satu perintah ini. Pastikan 'node-fetch' ada di package.json Anda.
         run: npm install
 
       - name: 5. Create Authentication Files from Secrets
@@ -37,12 +36,13 @@ jobs:
 
       - name: 6. Jalankan Skrip Utama Bot
         env:
-          # Ini adalah semua env yang dibutuhkan oleh kode final kita
+          # Pastikan nama-nama ini sesuai dengan yang ada di Pengaturan GitHub Anda
           BOT_LICENSE_EMAIL: ${{ secrets.BOT_LICENSE_EMAIL }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           YT_CHANNEL_NAME: ${{ vars.CHANNEL_NAME }}
-        run: node index.js # PERBAIKAN: Perintah 'run' dipindahkan ke posisi yang benar
+        # PERBAIKAN: Perintah 'run' dipindahkan ke sini
+        run: node index.js
 
       - name: 7. Simpan Log Baru ke Repositori
         if: success()
@@ -50,7 +50,7 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           # Cek apakah ada perubahan sebelum mencoba commit
-          if ! git diff --quiet --exit-code processed_*.log quotes.txt; then
+          if ! git diff --quiet --exit-code processed*.log quotes.txt; then
             git add .
             git commit -m "Bot: Update logs and quote list"
             git push
