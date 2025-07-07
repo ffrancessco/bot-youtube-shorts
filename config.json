@@ -12,7 +12,7 @@
   "quote_bot_config": {
     "source_file": "quotes.txt",
     "pexels_keyword": "nature",
-    "footage_count": 7,
+    "footage_count": 1,
     "video_settings": {
       "duration_seconds": 30
     },
